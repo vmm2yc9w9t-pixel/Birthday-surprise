@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For My Penguin 🐧💖</title>
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+  font-family: Arial;
+  color: white;
+  text-align: center;
+}
+
+/* LOCK SCREEN */
+#lockScreen {
+  position: absolute;
+  top: 40%;
+  width: 100%;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  padding: 12px 25px;
+  border-radius: 25px;
+  border: none;
+  background: #ff3c00;
+  color: white;
+  cursor: pointer;
+}
+
+/* MAIN */
+#mainContent { display: none; }
+
+h1 {
+  position: absolute;
+  top: 15%;
+  width: 100%;
+  font-size: 3em;
+}
+
+#name {
+  position: absolute;
+  top: 25%;
+  width: 100%;
+  font-size: 4em;
+  color: orange;
+  text-shadow: 0 0 20px red, 0 0 40px orange;
+  animation: flicker 0.1s infinite alternate;
+}
+
+@keyframes flicker {
+  from {opacity: 0.7;}
+  to {opacity: 1;}
+}
+
+#story {
+  position: absolute;
+  top: 65%;
+  width: 100%;
+  font-size: 1.2em;
+  opacity: 0;
+  transition: 1s;
+}
+
+#photo {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  border-radius: 20px;
+  display: none;
+  box-shadow: 0 0 20px white;
+}
+
+#cake {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 4em;
+  cursor: pointer;
+  display: none;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 LOCK SCREEN -->
+<div id="lockScreen">
+  <h1>Enter Password 🔐</h1>
+  <input type="password" id="pass" placeholder="Secret code">
+  <br><br>
+  <button onclick="checkPass()">Unlock 💌</button>
+  <p id="error" style="color:red;"></p>
+</div>
+
+<!-- 💖 MAIN CONTENT -->
+<div id="mainContent">
+  <h1>Happy Birthday 💖</h1>
+  <div id="name">ZAIBUN 🔥</div>
+
+  <div id="story"></div>
+
+  <!-- 📸 REPLACE PHOTO -->
+  <img id="photo" src="https://i.imgur.com/yourphoto.jpg">
+
+  <div id="cake" onclick="cutCake()">🎂</div>
+
+  <canvas id="canvas"></canvas>
+</div>
+
+<script>
+/* 🔐 PASSWORD */
+function checkPass(){
+  let password = document.getElementById("pass").value;
+
+  if(password === "penguin22"){ // CHANGE THIS
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
+    startExperience();
+  } else {
+    document.getElementById("error").innerText = "Wrong password 😤";
+  }
+}
+
+/* 🎂 CANVAS SETUP */
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+let mode = "fire";
+
+/* 🔥 FIRE */
+function fireEffect() {
+  for (let i = 0; i < 5; i++) {
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: canvas.height,
+      size: Math.random()*5+2,
+      speedY: Math.random()*-3-1,
+      color: `hsl(${Math.random()*50},100%,50%)`
+    });
+  }
+
+  particles.forEach((p,i)=>{
+    p.y += p.speedY;
+    p.size *= 0.96;
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+
+    if(p.size<0.5) particles.splice(i,1);
+  });
+}
+
+/* ❤️ HEART */
+function heartEffect() {
+  for(let t=0;t<Math.PI*2;t+=0.2){
+    let x = 16*Math.pow(Math.sin(t),3);
+    let y = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+
+    ctx.fillStyle="red";
+    ctx.fillRect(canvas.width/2+x*10,canvas.height/2+y*10,2,2);
+  }
+}
+
+/* 💌 STORY */
+let lines = [
+"From the moment I met you… 💫",
+"You became my Penguin 🐧",
+"My cute little Cat 🐱",
+"My everything 💖",
+"Today you turn 22 ✨",
+"And I still fall for you every day ❤️",
+"Happy Birthday Zaibun 🔥"
+];
+
+let i=0;
+
+function showStory(){
+  if(i<lines.length){
+    document.getElementById("story").innerHTML = lines[i];
+    document.getElementById("story").style.opacity = 1;
+    speak(lines[i]);
+    i++;
+    setTimeout(showStory,2500);
+  } else {
+    document.getElementById("photo").style.display = "block";
+    document.getElementById("cake").style.display = "block";
+    mode="heart";
+  }
+}
+
+/* 🔊 VOICE */
+function speak(text){
+  let speech = new SpeechSynthesisUtterance(text);
+  speech.rate = 0.9;
+  speech.pitch = 1.2;
+  speech.lang = "en-US";
+  speechSynthesis.speak(speech);
+}
+
+/* 🎂 CAKE */
+function cutCake(){
+  alert("🎂 Happy Birthday My Love 💖🔥");
+}
+
+/* 🎞 LOOP */
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(mode==="fire") fireEffect();
+  if(mode==="heart") heartEffect();
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* 🚀 START */
+function startExperience(){
+  showStory();
+}
+</script>
+
+</body>
+</html>
